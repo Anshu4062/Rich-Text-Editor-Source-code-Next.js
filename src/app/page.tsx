@@ -1,7 +1,5 @@
+import App from "./components/quillEditor";
+
 export default function Home() {
-  return (
-    <>
-      <h1>hi</h1>
-    </>
-  );
+  return <div> <App></App> </div>;
 }
