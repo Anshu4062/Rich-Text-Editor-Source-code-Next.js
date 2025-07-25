@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
@@ -53,7 +55,7 @@ const EditorjsTextEditor = () => {
   const [charCount, setCharCount] = useState(0);
   const [history, setHistory] = useState([""]);
   const [historyIndex, setHistoryIndex] = useState(0);
-  const editorRef = useRef(null);
+  const editorRef = useRef<HTMLDivElement>(null);
 
   const initialContent = `<p>Welcome to Editor.js Pro! This is a comprehensive rich text editor with advanced features including:</p><ul><li>Complete text formatting options</li><li>Table insertion and editing</li><li>Image and link insertion</li><li>Undo/Redo functionality</li><li>Export capabilities</li><li>Full customization settings</li></ul>`;
 
@@ -71,35 +73,16 @@ const EditorjsTextEditor = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.innerHTML = initialContent;
-      handleInput();
-      setHistory([initialContent]);
-      setHistoryIndex(0);
-    }
-  }, [initialContent, handleInput]);
-
   const saveToHistory = useCallback(() => {
     if (editorRef.current) {
       const newHistory = history.slice(0, historyIndex + 1);
-      newHistory.push(editorRef.current.innerHTML);
-      setHistory(newHistory);
-      setHistoryIndex(newHistory.length - 1);
+      if (newHistory[newHistory.length - 1] !== editorRef.current.innerHTML) {
+        newHistory.push(editorRef.current.innerHTML);
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+      }
     }
   }, [history, historyIndex]);
-
-  const executeCommand = useCallback(
-    (command, value = null) => {
-      if (editorRef.current) {
-        editorRef.current.focus();
-        document.execCommand(command, false, value);
-        updateActiveFormats();
-        saveToHistory();
-      }
-    },
-    [saveToHistory]
-  );
 
   const updateActiveFormats = useCallback(() => {
     const formats = new Set();
@@ -114,6 +97,27 @@ const EditorjsTextEditor = () => {
     } catch (e) {}
     setActiveFormats(formats);
   }, []);
+
+  const executeCommand = useCallback(
+    (command: string, value: string | null = null) => {
+      if (editorRef.current) {
+        editorRef.current.focus();
+        document.execCommand(command, false, value as never);
+        updateActiveFormats();
+        saveToHistory();
+      }
+    },
+    [saveToHistory, updateActiveFormats]
+  );
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.innerHTML = initialContent;
+      handleInput();
+      setHistory([initialContent]);
+      setHistoryIndex(0);
+    }
+  }, [initialContent, handleInput]);
 
   const undo = useCallback(() => {
     if (historyIndex > 0) {
@@ -170,7 +174,7 @@ const EditorjsTextEditor = () => {
     }
   }, [executeCommand]);
 
-  const changeFontSize = useCallback((size) => {
+  const changeFontSize = useCallback((size: string) => {
     setFontSize(size);
     if (editorRef.current) {
       editorRef.current.style.fontSize = size + "px";
@@ -561,28 +565,13 @@ const QuillEditor = () => {
   const [replaceTerm, setReplaceTerm] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [isCollaborating, setIsCollaborating] = useState(false);
-  const editorRef = useRef(null);
+  const editorRef = useRef<HTMLDivElement>(null);
 
   const initialContent = `<p>Welcome to <strong>Quill Pro Editor</strong>! This advanced editor includes:</p><ul><li>🎨 <em>Complete formatting options</em> with colors and fonts</li><li>🔍 <u>Search and replace functionality</u></li><li>😀 Emoji insertion and special characters</li><li>📅 Date insertion and math expressions</li><li>👁️ Live preview mode</li></ul><blockquote style="border-left: 4px solid #3b82f6; padding-left: 1rem; margin: 1rem 0; color: #4b5563;">Try out the new features like video and file embedding!</blockquote>`;
 
   const handleInput = useCallback(() => {
     if (editorRef.current) {
       setContent(editorRef.current.innerHTML);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.innerHTML = initialContent;
-      handleInput();
-    }
-  }, [initialContent, handleInput]);
-
-  const executeCommand = useCallback((command, value = null) => {
-    if (editorRef.current) {
-      editorRef.current.focus();
-      document.execCommand(command, false, value);
-      updateActiveFormats();
     }
   }, []);
 
@@ -597,6 +586,24 @@ const QuillEditor = () => {
     } catch (e) {}
     setActiveFormats(formats);
   }, []);
+
+  const executeCommand = useCallback(
+    (command: string, value: string | null = null) => {
+      if (editorRef.current) {
+        editorRef.current.focus();
+        document.execCommand(command, false, value as never);
+        updateActiveFormats();
+      }
+    },
+    [updateActiveFormats]
+  );
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.innerHTML = initialContent;
+      handleInput();
+    }
+  }, [initialContent, handleInput]);
 
   const insertLink = useCallback(() => {
     const url = prompt("Enter URL:");
@@ -973,7 +980,7 @@ const TiptapEditor = () => {
   });
   const [history, setHistory] = useState([""]);
   const [historyIndex, setHistoryIndex] = useState(0);
-  const editorRef = useRef(null);
+  const editorRef = useRef<HTMLDivElement>(null);
 
   const initialContent = `<h1>Welcome to TipTap Ultimate! 🚀</h1><p>This is the most <strong>advanced editor</strong> with features like:</p><div style="background: #e0f2fe; border-left: 4px solid #0288d1; color: #01579b; padding: 12px; margin: 10px 0; border-radius: 4px;"><strong>ℹ️ Info</strong><br>Try out all the amazing features available in this editor!</div><ul><li>🎨 Multiple themes and customization</li><li>📊 Advanced analytics and word counting</li><li>📝 Markdown export functionality</li><li>🔧 Plugin system with toggleable features</li><li>💬 Social features like mentions and hashtags</li><li>📋 Task lists and callout boxes</li></ul><ul style="list-style: none; padding-left: 0;"><li style="margin: 8px 0;"><label style="display: flex; align-items: center;"><input type="checkbox" style="margin-right: 8px;"><span>Try this interactive task list</span></label></li><li style="margin: 8px 0;"><label style="display: flex; align-items: center;"><input type="checkbox" style="margin-right: 8px;"><span>Check off completed items</span></label></li></ul><pre style="background-color: #f8f9fa; padding: 12px; border-radius: 4px; font-family: 'Courier New', monospace; border-left: 4px solid #6366f1; margin: 10px 0;"><code data-language="javascript">// JavaScript Example
 console.log('Hello from TipTap Ultimate!');</code></pre><p>Try mentioning someone with <span style="background: #3b82f6; color: white; padding: 2px 6px; border-radius: 12px; font-size: 12px;">@username</span> or add hashtags like <span style="color: #3b82f6; font-weight: 500;">#awesome</span>!</p>`;
@@ -1008,22 +1015,34 @@ console.log('Hello from TipTap Ultimate!');</code></pre><p>Try mentioning someon
   const saveToHistory = useCallback(() => {
     if (editorRef.current) {
       const newHistory = history.slice(0, historyIndex + 1);
-      newHistory.push(editorRef.current.innerHTML);
-      setHistory(newHistory);
-      setHistoryIndex(newHistory.length - 1);
+      if (newHistory[newHistory.length - 1] !== editorRef.current.innerHTML) {
+        newHistory.push(editorRef.current.innerHTML);
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+      }
     }
   }, [history, historyIndex]);
 
+  const updateActiveFormats = useCallback(() => {
+    const formats = new Set();
+    try {
+      if (document.queryCommandState("bold")) formats.add("bold");
+      if (document.queryCommandState("italic")) formats.add("italic");
+      if (document.queryCommandState("underline")) formats.add("underline");
+    } catch (e) {}
+    setActiveFormats(formats);
+  }, []);
+
   const executeCommand = useCallback(
-    (command, value = null) => {
+    (command: string, value: string | null = null) => {
       if (editorRef.current) {
         editorRef.current.focus();
-        document.execCommand(command, false, value);
+        document.execCommand(command, false, value as never);
         updateActiveFormats();
         saveToHistory();
       }
     },
-    [saveToHistory]
+    [saveToHistory, updateActiveFormats]
   );
 
   const undo = useCallback(() => {
@@ -1057,16 +1076,6 @@ console.log('Hello from TipTap Ultimate!');</code></pre><p>Try mentioning someon
     }
   }, [initialContent, handleInput]);
 
-  const updateActiveFormats = useCallback(() => {
-    const formats = new Set();
-    try {
-      if (document.queryCommandState("bold")) formats.add("bold");
-      if (document.queryCommandState("italic")) formats.add("italic");
-      if (document.queryCommandState("underline")) formats.add("underline");
-    } catch (e) {}
-    setActiveFormats(formats);
-  }, []);
-
   const insertCodeBlock = useCallback(() => {
     const language = prompt("Enter programming language (optional):");
     const codeBlockHtml = `<pre style="background-color: #f8f9fa; padding: 12px; border-radius: 4px; font-family: 'Courier New', monospace; border-left: 4px solid #6366f1; margin: 10px 0;"><code${
@@ -1078,8 +1087,8 @@ console.log('Hello from TipTap Ultimate!');</code></pre><p>Try mentioning someon
   }, [executeCommand]);
 
   const insertCallout = useCallback(
-    (type) => {
-      const calloutStyles = {
+    (type: string) => {
+      const calloutStyles: { [key: string]: string } = {
         info: "background: #e0f2fe; border-left: 4px solid #0288d1; color: #01579b;",
         warning:
           "background: #fff3e0; border-left: 4px solid #f57c00; color: #e65100;",
@@ -1088,7 +1097,7 @@ console.log('Hello from TipTap Ultimate!');</code></pre><p>Try mentioning someon
         error:
           "background: #ffebee; border-left: 4px solid #f44336; color: #c62828;",
       };
-      const icons = {
+      const icons: { [key: string]: string } = {
         info: "ℹ️",
         warning: "⚠️",
         success: "✅",
@@ -1151,10 +1160,10 @@ console.log('Hello from TipTap Ultimate!');</code></pre><p>Try mentioning someon
     URL.revokeObjectURL(url);
   }, [markdown]);
 
-  const applyTheme = useCallback((theme) => {
+  const applyTheme = useCallback((theme: string) => {
     setSelectedTheme(theme);
     if (editorRef.current) {
-      const themes = {
+      const themes: { [key: string]: { bg: string; color: string } } = {
         default: { bg: "#ffffff", color: "#374151" },
         dark: { bg: "#1f2937", color: "#f9fafb" },
         sepia: { bg: "#fef7ed", color: "#92400e" },
@@ -1461,7 +1470,6 @@ const App = () => {
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
             Rich Text Editors Collection
           </h1>
-         
         </div>
         <div className="space-y-8">
           <EditorjsTextEditor />
